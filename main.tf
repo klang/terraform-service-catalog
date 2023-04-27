@@ -25,8 +25,14 @@ resource "aws_s3_object" "product" {
   source = "products/${each.value}"
   etag = filemd5("products/${each.value}")
 }
+/*
+output "products" {
+  value = aws_s3_object.product
+}
+*/
 
 module "portfolio" {
+  count = 0
   source                  = "./portfolio"
   portfolio_name          = "Nice Helpers Terraform"
   portfolio_description   = "Example Portfolio provided and managed by Terraform"
@@ -51,9 +57,7 @@ module "product" {
   description = "test"
   version_name = "v1.0"
   product_name = "testing"
-  template_url = "s3://940740948575-service-catalog-products/AccountSpecificTrustRole.yaml"
-#  template_url = "https://940740948575-service-catalog-products.s3.eu-west-1.amazonaws.com/AccountSpecificTrustRole.yaml"
-#  template_url = "https://940740948575-service-catalog-products.s3.amazonaws.com/AccountSpecificTrustRole.yaml"
+  template_url = "https://940740948575-service-catalog-products.s3.eu-west-1.amazonaws.com/AccountSpecificTrustRole.yaml"
   providers = {
     aws.shared = aws.shared
     aws.master = aws.master
@@ -74,6 +78,7 @@ module "product" {
 (base) ➜  terraform-service-catalog git:(master) ✗ terraform plan
 */
 module "TrainingCostBudget" {
+  count = 0
   source        = "./product_with_versions"
   product_name  = "TrainingCostBudget"
   product_owner = "Terraform"
@@ -94,6 +99,7 @@ module "TrainingCostBudget" {
 }
 
 module "TrustRole" {
+  count = 0
   source        = "./product_with_versions"
   product_name  = "TrustRole"
   product_owner = "Terraform"
@@ -134,6 +140,7 @@ module "TrustRole" {
 }
 
 module "AccountSpecificTrustRole" {
+  count = 0
   source        = "./product_with_versions"
   product_name  = "AccountSpecificTrustRole"
   product_owner = "Terraform"
@@ -157,6 +164,7 @@ module "AccountSpecificTrustRole" {
 }
 
 module "SimpleVPCAndLinux" {
+  count = 0
   source        = "./product_with_versions"
   product_name  = "SimpleVPCAndLinux"
   product_owner = "Terraform"
