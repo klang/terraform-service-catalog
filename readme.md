@@ -43,3 +43,20 @@ The template is `cross-account-access-terraform.yaml` and has to be added
 
 Note that we have prepared a bucket for the terraform state. This bucket is referred in `backend.tf` too.
 
+
+# Warning
+
+Some of the elements we are using in this project do no play nice with parallel execution currently:
+
+    │ Error: creating Service Catalog Portfolio Share: InvalidStateException: Cannot process more than one portfolio share action at the same time. Try again later.
+    │
+    │   with module.portfolio.aws_servicecatalog_portfolio_share.organizational_units[0],
+    │   on portfolio/main.tf line 40, in resource "aws_servicecatalog_portfolio_share" "organizational_units":
+    │   40: resource "aws_servicecatalog_portfolio_share" "organizational_units" {
+
+This can be fixed by explicitly setting parallelism to 1, as indicated below.
+
+# terraform apply
+
+    TF_CLI_ARGS_apply="-parallelism=1"
+    terraform apply

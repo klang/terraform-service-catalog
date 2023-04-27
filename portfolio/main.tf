@@ -37,6 +37,8 @@ resource "aws_servicecatalog_product_portfolio_association" "product" {
     product_id   = var.products[count.index]
 }
 
+# requires
+# TF_CLI_ARGS_apply="-parallelism=1"
 resource "aws_servicecatalog_portfolio_share" "organizational_units" {
     provider     = aws.shared
     count        = length(local.ou_arns)

@@ -20,20 +20,26 @@ resource "aws_s3_object" "product" {
 }
 
 module "portfolio" {
-  count = 0
   source                  = "./portfolio"
   portfolio_name          = "Nice Helpers Terraform"
   portfolio_description   = "Example Portfolio provided and managed by Terraform"
   portfolio_provider_name = "Terraform"
-  #training (pre-existing products)
-  #products = ["prod-ytfjfndekv6lk", "prod-35wvktpt3n4ei"]
-  #shared-services (pre-existing products)
-  products = ["prod-6ad34fypnowfy", "prod-54fwbgl57phw4"]
+  products = [
+    module.TrainingCostBudget.product_id,
+    module.TrustRole.product_id,
+    module.SimpleVPCAndLinux.product_id,
+    module.AccountSpecificTrustRole.product_id]
   ou_names = ["Custom", "Training", "Juniors"]
   providers = {
     aws.shared = aws.shared
     aws.master = aws.master
    }
+   depends_on = [
+      module.TrainingCostBudget.product_id,
+      module.TrustRole.product_id,
+      module.SimpleVPCAndLinux.product_id,
+      module.AccountSpecificTrustRole.product_id,
+   ]
 }
 
 output "TrainingCostBudget" {
@@ -49,18 +55,6 @@ output "AccountSpecificTrustRole" {
   value = module.AccountSpecificTrustRole.product_id
 }
 
-/*
-(base) ➜  terraform-service-catalog git:(master) ✗ aws s3 ls  s3://940740948575-service-catalog-products
-2023-04-26 15:19:08        640 AccountSpecificTrustRole.yaml
-2023-04-26 15:19:08        686 AccountSpecificTrustRoleReadOnlyAccess.yaml
-2023-04-26 15:19:08       1810 MultiAccountTrustRole.yaml
-2023-04-26 15:19:08       3615 TrainingCostBudget.yaml
-2023-04-26 15:19:08       1140 UserSpecificTrustRole.yaml
-2023-04-26 15:19:08       3929 simple-vpc-and-linux-instance-with-ssm-only.yaml
-2023-04-26 15:19:08       4578 simple-vpc-and-linux-instance-with-ssm.yaml
-2023-04-26 15:19:08       3869 simple-vpc-and-linux-instance.yaml
-(base) ➜  terraform-service-catalog git:(master) ✗ terraform plan
-*/
 module "TrainingCostBudget" {
   source        = "./product_with_versions"
   product_name  = "TrainingCostBudget"
