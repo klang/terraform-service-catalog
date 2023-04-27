@@ -19,7 +19,7 @@ resource "aws_servicecatalog_provisioning_artifact" "this" {
   description = var.versions[count.index + 1 ].description 
   disable_template_validation = var.disable_template_validation
   name = var.versions[count.index + 1].name
-  template_url = "https://${var.versions[count.index +1].bucket.bucket_regional_domain_name}/${var.versions[count.index + 1].template}"
+  template_url = "https://${var.versions[count.index + 1].bucket.bucket_regional_domain_name}/${var.versions[count.index + 1].template}"
   timeouts {
     create = "3m"
     delete = "3m"

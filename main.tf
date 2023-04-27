@@ -78,7 +78,6 @@ module "product" {
 (base) ➜  terraform-service-catalog git:(master) ✗ terraform plan
 */
 module "TrainingCostBudget" {
-  count = 0
   source        = "./product_with_versions"
   product_name  = "TrainingCostBudget"
   product_owner = "Terraform"
