@@ -8,9 +8,7 @@ terraform {
   }
 }
 
-# observe that the first product is referred to by the s3:// url, while the following use https://
-# This is an inconsistency in the servicecatalog interface that requires this 
-
+# we grab the first version of the product and use it in the `provisioning_artifact_parameters` the rest are created as `aws_servicecatalog_provisioning_artifact`'s
 resource "aws_servicecatalog_provisioning_artifact" "this" {
   provider = aws.shared
   count = length(var.versions) - 1
@@ -40,8 +38,6 @@ resource "aws_servicecatalog_product" "this" {
       description = var.versions[0].description 
       disable_template_validation = var.disable_template_validation
       name = var.versions[0].name
-      #template_url = var.versions[0].template_url
-      #template_url = "s3://${var.versions[0].bucket.bucket}/${var.versions[0].template}"
       template_url = "https://${var.versions[0].bucket.bucket_regional_domain_name}/${var.versions[0].template}"
   }
   

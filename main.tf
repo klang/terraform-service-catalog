@@ -98,7 +98,6 @@ module "TrainingCostBudget" {
 }
 
 module "TrustRole" {
-  count = 0
   source        = "./product_with_versions"
   product_name  = "TrustRole"
   product_owner = "Terraform"
@@ -139,7 +138,6 @@ module "TrustRole" {
 }
 
 module "AccountSpecificTrustRole" {
-  count = 0
   source        = "./product_with_versions"
   product_name  = "AccountSpecificTrustRole"
   product_owner = "Terraform"
@@ -163,26 +161,30 @@ module "AccountSpecificTrustRole" {
 }
 
 module "SimpleVPCAndLinux" {
-  count = 0
   source        = "./product_with_versions"
   product_name  = "SimpleVPCAndLinux"
   product_owner = "Terraform"
   product_description   = "A series of different linux configurations"
   # the bucket is passed to the module to allow for
-  # First product created in aws_servicecatalog_product and template is referred via s3://bucket/
-  # Following products are created in aws_servicecatalog_provisioning_artifact and referred via https://bucket_regional_domain_name/
-  # this is an inconsistency in the way these two resources work
+  # First product created in aws_servicecatalog_product
+  # Following products are created in aws_servicecatalog_provisioning_artifact
   versions = [ 
     { 
       name = "v1.0"
       description = "VPC with Linux with public ssh access"
-      template      = "simple-vpc-and-linuxinstance.yaml"
+      template      = "simple-vpc-and-linux-instance.yaml"
       bucket        = aws_s3_bucket.products
     },
     { 
       name = "v1.1"
       description = "VPC with Linux with access through ssm"
       template      = "simple-vpc-and-linux-instance-with-ssm.yaml"
+      bucket        = aws_s3_bucket.products
+    },
+    { 
+      name = "v1.2"
+      description = "VPC with Linux with access through ssm only"
+      template      = "simple-vpc-and-linux-instance-with-ssm-only.yaml"
       bucket        = aws_s3_bucket.products
     }
     
