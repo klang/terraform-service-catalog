@@ -1,10 +1,3 @@
-/*
-data "aws_availability_zones" "available" {}
-output "availability_zones" {
-  value = data.aws_availability_zones.available
-}
-*/
-
 resource "aws_s3_bucket" "products" {
   bucket = "${local.account_id}-service-catalog-products"
 }
@@ -25,11 +18,6 @@ resource "aws_s3_object" "product" {
   source = "products/${each.value}"
   etag = filemd5("products/${each.value}")
 }
-/*
-output "products" {
-  value = aws_s3_object.product
-}
-*/
 
 module "portfolio" {
   count = 0
@@ -52,7 +40,7 @@ module "portfolio" {
   value = module.portfolio.portfolio 
 } */
 
-module "product" {
+/* module "product" {
   source        = "./product"
   description = "test"
   version_name = "v1.0"
@@ -62,7 +50,7 @@ module "product" {
     aws.shared = aws.shared
     aws.master = aws.master
    }
-}
+} */
 
 
 /*
