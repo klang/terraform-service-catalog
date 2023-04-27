@@ -1,3 +1,3 @@
-output "product" {
-  value = aws_servicecatalog_product.this
+output "product_id" {
+  value = aws_servicecatalog_product.this.id
 }
