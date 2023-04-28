@@ -1,24 +1,3 @@
-resource "aws_s3_bucket" "products" {
-  bucket = "${local.account_id}-service-catalog-products"
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "products" {
-  bucket = aws_s3_bucket.products.id
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm     = "AES256"
-    }
-  }
-}
-
-resource "aws_s3_object" "product" {
-  for_each = fileset("products/", "*.yaml")
-  bucket = aws_s3_bucket.products.id
-  key = "${each.value}"
-  source = "products/${each.value}"
-  etag = filemd5("products/${each.value}")
-}
-
 module "portfolio" {
   source                  = "./portfolio"
   portfolio_name          = "Nice Helpers Terraform"
@@ -42,19 +21,6 @@ module "portfolio" {
    ]
 }
 
-output "TrainingCostBudget" {
-  value = module.TrainingCostBudget.product_id
-}
-output "TrustRole" {
-  value = module.TrustRole.product_id
-}
-output "SimpleVPCAndLinux" {
-  value = module.SimpleVPCAndLinux.product_id
-}
-output "AccountSpecificTrustRole" {
-  value = module.AccountSpecificTrustRole.product_id
-}
-
 module "TrainingCostBudget" {
   source        = "./product_with_versions"
   product_name  = "TrainingCostBudget"
@@ -69,6 +35,18 @@ module "TrainingCostBudget" {
 
     }
   ]
+  launch_role_policy_document = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+    {
+        Action = [
+        "budgets:*",
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+    },
+    ]
+})
   providers = {
     aws.shared = aws.shared
     aws.master = aws.master
@@ -108,11 +86,23 @@ module "TrustRole" {
       bucket       = aws_s3_bucket.products
 
     }
-    ]
+  ]
+  launch_role_policy_document = jsonencode({
+      Version = "2012-10-17"
+      Statement = [
+      {
+          Action = [
+          "iam:*",
+          ]
+          Effect   = "Allow"
+          Resource = "*"
+      },
+      ]
+  })  
   providers = {
     aws.shared = aws.shared
     aws.master = aws.master
-   }
+  }
 }
 
 module "AccountSpecificTrustRole" {
@@ -132,10 +122,22 @@ module "AccountSpecificTrustRole" {
 
     }
   ]
+  launch_role_policy_document = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+    {
+        Action = [
+        "iam:*",
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+    },
+    ]
+  })
   providers = {
     aws.shared = aws.shared
     aws.master = aws.master
-   }
+  }
 }
 
 module "SimpleVPCAndLinux" {
@@ -166,10 +168,22 @@ module "SimpleVPCAndLinux" {
       bucket        = aws_s3_bucket.products
     }
     
+  ] 
+  launch_role_policy_document = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ec2:*",
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
     ]
+  })
   providers = {
     aws.shared = aws.shared
     aws.master = aws.master
-   }
+  }
 }
 

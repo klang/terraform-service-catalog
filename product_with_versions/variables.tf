@@ -15,3 +15,5 @@ variable versions {
         bucket = object}
         ) */
     }
+
+variable launch_role_policy_document { default = null }

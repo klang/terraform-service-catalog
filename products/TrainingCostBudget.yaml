@@ -1,0 +1,118 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Training Budget with notifications at $5,$10,$25 and $45 for individual developer accounts.
+
+Parameters:
+  RecipientEmailAddress:
+    Type: String
+    Description: >
+      The email recipient of any billing alarms.
+    Default: klp@conscia.com
+
+Resources:
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-budgets-budget.html
+  CostBudget:
+    Type: AWS::Budgets::Budget
+    Properties:
+      Budget:
+        BudgetName: Cost
+        BudgetType: COST
+        TimeUnit: MONTHLY
+        BudgetLimit:
+          Amount: 50
+          Unit: USD
+      NotificationsWithSubscribers:
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 45
+          Subscribers:
+            - SubscriptionType: EMAIL
+              Address: !Ref RecipientEmailAddress
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 25
+          Subscribers:
+            - SubscriptionType: EMAIL
+              Address: !Ref RecipientEmailAddress
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 10
+          Subscribers:
+            - SubscriptionType: EMAIL
+              Address: !Ref RecipientEmailAddress
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 5
+          Subscribers:
+            - SubscriptionType: EMAIL
+              Address: !Ref RecipientEmailAddress
+
+  UsageBudget:
+    Type: AWS::Budgets::Budget
+    Properties:
+      Budget:
+        BudgetName: Usage
+        BudgetType: USAGE
+        TimeUnit: MONTHLY
+        CostTypes:
+          IncludeTax: true
+          IncludeSubscription: true
+          UseBlended: false
+          IncludeSupport: true
+          IncludeOtherSubscription: true
+          IncludeRecurring: true
+          IncludeUpfront: true
+          IncludeCredit: true
+          IncludeRefund: true
+          IncludeDiscount: true
+          UseAmortized: false
+        CostFilters:
+          UsageTypeGroup:
+            - "EC2: Running Hours"
+          LinkedAccount:
+            - !Ref "AWS::AccountId"
+        BudgetLimit:
+          Amount: "240"
+          Unit: "Hrs"
+      NotificationsWithSubscribers:
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 45
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            - SubscriptionType: EMAIL
+              Address: !Ref RecipientEmailAddress
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 25
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            - SubscriptionType: EMAIL
+              Address: !Ref RecipientEmailAddress
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 10
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            - SubscriptionType: EMAIL
+              Address: !Ref RecipientEmailAddress
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 5
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            - SubscriptionType: EMAIL
+              Address: !Ref RecipientEmailAddress
+Outputs:
+  CostBudgetId:
+    Value: !Ref CostBudget
+  UsageBudgetId:
+    Value: !Ref UsageBudget

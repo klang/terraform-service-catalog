@@ -1,0 +1,170 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Simple VPC with one public subnet and one instance - access via ssm and ssh (and port 80)"
+
+Parameters:
+  KeyName:
+    Type:         AWS::EC2::KeyPair::KeyName
+    Description:  Name of an existing EC2 KeyPair to enable SSH access to the instance
+  VPCCIDR:
+    Type:         String
+    Description:  VPC address range
+    Default:      10.15.0.0/16
+  PublicSubnetCIDR:
+    Type:         String
+    Description:  Public Subnet in VPC
+    Default:      10.15.1.0/24
+  CompanyWANIP:
+    Type:         String
+    Description:  Company WANIP - Format x.x.x.x/32
+    Default:      162.158.134.60/32
+
+Resources:
+
+  ## Infrastructure. VPC, Subnet, InternetGateway, Routes
+
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VPCCIDR
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: Simple VPC
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PublicSubnetCIDR
+      Tags:
+        - Key: Name
+          Value: Public
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: Simple VPC
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: Public
+
+  RouteAttachment:
+    Type: AWS::EC2::Route
+    DependsOn:
+      - InternetGatewayAttachment
+      - RouteTable
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref InternetGateway
+
+  VPCRouteSubnet:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    DependsOn:  RouteTable
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId:     !Ref PublicSubnet
+
+  ## security groups
+
+  SSHSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref VPC
+      GroupDescription: ssh-from-office
+      SecurityGroupEgress:
+        - CidrIp:     0.0.0.0/0
+          IpProtocol: "-1"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort:   22
+          ToPort:     22
+          CidrIp:     !Ref CompanyWANIP
+
+  HTTPSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref VPC
+      GroupDescription: http-access-from-everywhere
+      SecurityGroupEgress:
+        - CidrIp:     0.0.0.0/0
+          IpProtocol: "-1"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort:   80
+          ToPort:     80
+
+  LinuxInstance:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      # this instance has ssm installed out of the box
+      # aws ec2 describe-images --owners 099720109477 --filters "Name=name,Values=ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*" --query 'sort_by(Images,&CreationDate)[-1].ImageId' --region eu-west-1
+      ImageId: "ami-02df9ea15c1778c9c"
+      KeyName: !Ref KeyName
+      IamInstanceProfile: !Ref SSMInstanceProfile
+      Tags:
+        - Key: Name
+          Value: Linux Server
+      InstanceType: "t3.medium"
+      Tenancy: "default"
+      Monitoring: true
+      DisableApiTermination: false
+      InstanceInitiatedShutdownBehavior: "stop"
+      CreditSpecification:
+        CPUCredits: "unlimited"
+      EbsOptimized: true
+      BlockDeviceMappings:
+        -
+          DeviceName: "/dev/sda1"
+          Ebs:
+            VolumeSize: 80
+            DeleteOnTermination: true
+            VolumeType: "gp2"
+      NetworkInterfaces:
+        -
+          DeviceIndex: 0
+          Description: "Primary network interface"
+          AssociatePublicIpAddress: true
+          DeleteOnTermination: true
+          SubnetId: !Ref PublicSubnet
+          Ipv6AddressCount: 0
+          GroupSet:
+            - !Ref SSHSecurityGroup
+            - !Ref HTTPSecurityGroup
+
+  SSMInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-SSMInstanceProfile"
+      Path: "/"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+  SSMInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+        - !Ref SSMInstanceRole

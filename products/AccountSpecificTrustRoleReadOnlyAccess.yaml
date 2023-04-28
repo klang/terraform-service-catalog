@@ -1,0 +1,23 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Cross account administrator role for CloudPartners
+Resources:
+  CloudPartners:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: temporary-trusted-account
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              AWS: arn:aws:iam::055524301700:root
+            Condition:
+              Bool:
+                aws:MultiFactorAuthPresent: true
+            Sid: ''
+        Version: '2012-10-17'
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/ReadOnlyAccess
+        - arn:aws:iam::aws:policy/AWSSupportAccess

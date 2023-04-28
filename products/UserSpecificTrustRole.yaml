@@ -1,0 +1,36 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Cross account administrator role for named individuals at Conscia
+Parameters:
+  TrustedUsers:
+    Type: CommaDelimitedList
+    Default: 'sanne,karsten,ramlov,lennart,christian,johnni,jonas,kasper'
+    Description: Usernames that need access to this role.
+Resources:
+  TemporaryTrustedUser:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: temporary-trusted-user
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::Split:
+                  - ","
+                  - Fn::Sub:
+                      - arn:aws:iam::055524301700:user/${rest}
+                      - rest:
+                          Fn::Join:
+                            - ",arn:aws:iam::055524301700:user/"
+                            - Ref: TrustedUsers
+            Condition:
+              Bool:
+                aws:MultiFactorAuthPresent: true
+            Sid: ''
+        Version: '2012-10-17'
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+
