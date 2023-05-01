@@ -1,0 +1,44 @@
+{
+  "ServiceCatalogLaunchRole${ProductName}": {
+    "Type": "AWS::IAM::Role",
+    "Properties": {
+        "RoleName": "ServiceCatalogLaunchRole${ProductName}",
+        "AssumeRolePolicyDocument": {
+            "Statement": [
+                {
+                    "Action": "sts:AssumeRole",
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "servicecatalog.amazonaws.com"
+                    },
+                    "Sid": ""
+                }
+            ],
+            "Version": "2012-10-17"
+        },
+        "Path": "/",
+        "Policies": [
+            {
+                "PolicyName": "default-launch-role-policy",
+                "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "cloudformation:*",
+                                "s3:GetObject"
+                            ],
+                            "Resource": "*"
+                        }
+                    ]
+                }
+            },
+            {
+                "PolicyName": "${ProductName}-specific-permissions",
+                "PolicyDocument": ${PolicyDocument}
+            }
+        ]
+    }
+  }
+}
