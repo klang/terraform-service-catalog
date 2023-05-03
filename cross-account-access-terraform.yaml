@@ -1,0 +1,39 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Terraform uses this role in the provider.tf to access resources on the
+  account. Users in TrustRelationship Accounts can take this role, but must set an
+  ExternalId
+Parameters:
+  TrustRelationships:
+    Type: CommaDelimitedList
+    Default: '055524301700'
+    Description: AccountsIDs that need access to this role.
+Resources:
+  Terraform:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: terraform
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::Split:
+                  - ","
+                  - Fn::Sub:
+                      - arn:aws:iam::${rest}:root
+                      - rest:
+                          Fn::Join:
+                            - ":root,arn:aws:iam::"
+                            - Ref: TrustRelationships
+            Condition:
+              Bool:
+                aws:MultiFactorAuthPresent: true
+              StringEquals:
+                sts:ExternalId: terraform
+            Sid: ''
+        Version: '2012-10-17'
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
