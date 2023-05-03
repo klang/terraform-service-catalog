@@ -9,3 +9,7 @@ output "ou_names" {
 output "ou_arns" {
     value = local.ou_arns
 }
+
+output "ou_ids" {
+    value = local.ou_ids
+}

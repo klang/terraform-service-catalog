@@ -21,6 +21,7 @@ data "aws_organizations_organizational_units" "ou" {
 # based on the ou_names, we use the master account to look up the ou's and make a list of ou_arns to be used later
 locals {
   ou_arns = [ for ou in data.aws_organizations_organizational_units.ou.children : ou.arn if contains(var.ou_names, ou.name) ]
+  ou_ids = [ for ou in data.aws_organizations_organizational_units.ou.children : ou.id if contains(var.ou_names, ou.name) ]
 }
 
 resource "aws_servicecatalog_portfolio" "portfolio" {

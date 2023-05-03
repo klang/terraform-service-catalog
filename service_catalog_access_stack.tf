@@ -118,24 +118,49 @@ resource "aws_organizations_delegated_administrator" "member_for_stacksets" {
 #  awsume controltower
 #  aws organizations list-delegated-services-for-account --account-id 940740948575
 
+# TODO: make a module for this .. 
 
 resource aws_cloudformation_stack_set "ServiceCatalogAccessStackSet" {
     provider = aws.shared
     #administration_role_arn = aws_iam_role.AWSCloudFormationStackSetAdministrationRole.arn
   
-    name = "ServiceCatalogAccessStackSet-${module.portfolio.portfolio.id}"
+    #name = "ServiceCatalogAccessStackSet-${module.portfolio.portfolio.id}"
+    name = "ServiceCatalogAccessStackSet"
     permission_model = "SERVICE_MANAGED"
     call_as = "DELEGATED_ADMIN"
     auto_deployment {
       enabled = true
       retain_stacks_on_account_removal = false
     }
+    operation_preferences {
+        max_concurrent_percentage = 100
+        failure_tolerance_percentage = 0
+    }
     
-    capabilities = ["CAPABILITY_IAM"]
+    capabilities = ["CAPABILITY_NAMED_IAM"]
+
+    # local.launch_roles contain the launch roles for EVERY POSSIBLE PRODUCT on the account
+    # iam roles are global, so they can't be applied multiple times unless we use different names
+    # different names for the same product launch role is considered outide the scope of this project
     template_body = jsonencode({
         AWSTemplateFormatVersion = "2010-09-09",
         Description = "Service Catalog Service Permissions",
         Resources = local.launch_roles
         }
     )
+}
+
+resource "aws_cloudformation_stack_set_instance" "ou" {
+    count = 0 # uncomment to include .. will take 20 minutes, most likely
+    provider = aws.shared
+    call_as = "DELEGATED_ADMIN"
+    deployment_targets {
+        organizational_unit_ids = module.portfolio.ou_ids
+    }
+    operation_preferences {
+        max_concurrent_percentage = 100
+        failure_tolerance_percentage = 0
+    }
+    region         = local.region
+    stack_set_name = aws_cloudformation_stack_set.ServiceCatalogAccessStackSet.name
 }

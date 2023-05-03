@@ -22,3 +22,12 @@ output "AccountSpecificTrustRole" {
 output "AccountSpecificTrustRoleLaunchRolePolicyDocument" {
   value = module.AccountSpecificTrustRole.launch_role_policy_document
 }
+output "ou_names" {
+    value = module.portfolio.ou_names
+}
+output "ou_arns" {
+    value = module.portfolio.ou_arns
+}
+output "ou_ids" {
+    value = module.portfolio.ou_ids
+}
