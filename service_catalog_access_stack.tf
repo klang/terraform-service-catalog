@@ -4,7 +4,7 @@
 # we need the principalNames from https://github.com/dashsoftaps/cdk-service-catalog-typescript/blob/master/lib/service-catalog-access-stackset/service-catalog-access-stack.ts
 
 
-locals {
+/* locals {
     launch_role_TrainingCostBudget = templatefile(
             "${path.module}/templates/service-catalog-launch-role.tftpl", 
             {
@@ -38,7 +38,7 @@ locals {
       jsondecode(local.launch_role_TrustRole),
       jsondecode(local.launch_role_AccountSpecificTrustRole),
       jsondecode(local.launch_role_SimpleVPCAndLinux))
-}
+} */
 
 /* 
 output "launch_roles_launch_role_SimpleVPCAndLinux" {
