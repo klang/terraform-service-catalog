@@ -16,7 +16,6 @@ locals {
     shared-services_region               = "eu-west-1"
     shared-services_account_id           = "940740948575"
 
-
   }
   master_account_id = "588412859260"
   account_alias = "${lookup(local.env, "${terraform.workspace}_account_alias")}"

@@ -11,7 +11,6 @@ terraform {
 
 resource aws_cloudformation_stack_set "ServiceCatalogAccessStackSet" {
     provider = aws.shared
-    #administration_role_arn = aws_iam_role.AWSCloudFormationStackSetAdministrationRole.arn
   
     name = "ServiceCatalogAccessStackSet-${var.portfolio_name}"
     #name = "ServiceCatalogAccessStackSet"
@@ -37,10 +36,16 @@ resource aws_cloudformation_stack_set "ServiceCatalogAccessStackSet" {
         Resources = var.launch_roles
         }
     )
+    # administration_role_arn is automatically generated because of auto_deployment
+    lifecycle {
+      ignore_changes = [ administration_role_arn ]
+    }
+
 }
 
 resource "aws_cloudformation_stack_set_instance" "ou" {
     #count = 0 # uncomment to include .. will take 20 minutes, most likely
+    count = var.create_access ? 1 : 0
     provider = aws.shared
     call_as = "DELEGATED_ADMIN"
     deployment_targets {
