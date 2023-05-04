@@ -1,3 +1,4 @@
+/*
 output "TrainingCostBudget" {
   value = module.TrainingCostBudget.product_id
 }
@@ -22,3 +23,4 @@ output "AccountSpecificTrustRole" {
 output "AccountSpecificTrustRoleLaunchRolePolicyDocument" {
   value = module.AccountSpecificTrustRole.launch_role_policy_document
 }
+*/

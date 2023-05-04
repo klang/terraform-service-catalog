@@ -35,25 +35,9 @@ module "MiscHelpers" {
    ]
 }
 
-output "res" {
-    value = jsonencode({
-        AWSTemplateFormatVersion = "2010-09-09",
-        Description = "Service Catalog Service Permissions",
-        Resources = local.MiscHelpers_no_new_launch_roles
-        }
-    )
-}
-
-output "other" {
-    value = jsonencode({
-        AWSTemplateFormatVersion = "2010-09-09",
-        Description = "Service Catalog Service Permissions",
-        Resources = local.MiscHelpers_launch_roles
-        }
-    )
-}
-
-
+# A portfolio containing TrainingCostBudget and SimpleVPCAndLinux has already been shared
+# with "Juniors", which means that we don't have to add local.MiscHelpers_launch_roles to
+# the ServiceCatalogAccess, we can just hoo
 module "ServiceCatalogAccessMiscHelpers" {
     source           = "./service_catalog_access_stackset"
     portfolio_name   = module.MiscHelpers.name
