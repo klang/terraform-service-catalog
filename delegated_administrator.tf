@@ -2,9 +2,9 @@ data "aws_organizations_delegated_administrators" "on_shared" {
     provider = aws.shared
     service_principal = "servicecatalog.amazonaws.com"
 }
-output "delegated_administrator_service_catalog" {
+/* output "delegated_administrator_service_catalog" {
     value = data.aws_organizations_delegated_administrators.on_shared
-}
+} */
 
 data "aws_organizations_delegated_administrators" "for_stacksets" {
     provider = aws.shared
@@ -12,9 +12,9 @@ data "aws_organizations_delegated_administrators" "for_stacksets" {
     depends_on = [ aws_organizations_delegated_administrator.member_for_stacksets ]
 }
 
-output "delegated_administrator_stack_sets" {
+/* output "delegated_administrator_stack_sets" {
     value = data.aws_organizations_delegated_administrators.for_stacksets
-}
+} */
 
 resource "aws_organizations_delegated_administrator" "member_for_stacksets" {
     provider = aws.master
