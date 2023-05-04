@@ -120,12 +120,13 @@ resource "aws_organizations_delegated_administrator" "member_for_stacksets" {
 
 # TODO: make a module for this .. 
 
-resource aws_cloudformation_stack_set "ServiceCatalogAccessStackSet" {
+/* resource aws_cloudformation_stack_set "ServiceCatalogAccessStackSet" {
     provider = aws.shared
     #administration_role_arn = aws_iam_role.AWSCloudFormationStackSetAdministrationRole.arn
   
     #name = "ServiceCatalogAccessStackSet-${module.portfolio.portfolio.id}"
     name = "ServiceCatalogAccessStackSet"
+    #name = "ServiceCatalogAccessStackSet-${module.portfolio.name}"
     permission_model = "SERVICE_MANAGED"
     call_as = "DELEGATED_ADMIN"
     auto_deployment {
@@ -148,9 +149,9 @@ resource aws_cloudformation_stack_set "ServiceCatalogAccessStackSet" {
         Resources = local.launch_roles
         }
     )
-}
+} */
 
-resource "aws_cloudformation_stack_set_instance" "ou" {
+/* resource "aws_cloudformation_stack_set_instance" "ou" {
     count = 0 # uncomment to include .. will take 20 minutes, most likely
     provider = aws.shared
     call_as = "DELEGATED_ADMIN"
@@ -164,3 +165,8 @@ resource "aws_cloudformation_stack_set_instance" "ou" {
     region         = local.region
     stack_set_name = aws_cloudformation_stack_set.ServiceCatalogAccessStackSet.name
 }
+
+output "portfolio_name" {
+#    value = "ServiceCatalogAccessStackSet-${replace(module.portfolio.portfolio.name, "/[^a-zA-Z0-9]/","")}"
+    value = "ServiceCatalogAccessStackSet-${module.portfolio.name}"
+} */

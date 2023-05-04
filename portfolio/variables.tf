@@ -1,4 +1,3 @@
-# for the portfolio
 variable portfolio_name {}
 variable portfolio_description {}
 variable portfolio_provider_name {}
