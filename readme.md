@@ -150,6 +150,8 @@ Make sure, that the SharedService account is registered as a delegated administr
     terraform destroy 
     # (may have to be repeated a few times)
 
+Terraform can't really handle the deletion of stack-instances as they are not part of the initial deployment, so they have to be deleted manually. 
+
     awsume controltower
     aws organizations list-organizational-units-for-parent --parent-id r-fmly
 
