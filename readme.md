@@ -85,7 +85,13 @@ This can be fixed by explicitly setting parallelism to 1, as indicated below.
     awsume controltower
     aws organizations enable-aws-service-access --service-principal stacksets.cloudformation.amazonaws.com
 
+    aws organizations register-delegated-administrator --account-id $delegated --service-principal stacksets.cloudformation.amazonaws.com
 
+    aws organizations enable-aws-service-access --service-principal member.org.stacksets.cloudformation.amazonaws.com
+    aws organizations register-delegated-administrator --account-id $delegated --service-principal member.org.stacksets.cloudformation.amazonaws.com
+
+    aws organizations list-delegated-services-for-account --account-id 940740948575
+    
 ### This has already been established above and isn't needed in the code
 
     /*
@@ -123,5 +129,31 @@ This can be fixed by explicitly setting parallelism to 1, as indicated below.
 
 # terraform apply
 
+Make sure, that the SharedService account is registered as a delegated administrator
+
+    # products need to be created first and `depends_on` isn't enough to ensure that.
+    mv portfolio_* off
+
     TF_CLI_ARGS_apply="-parallelism=1"
     terraform apply
+    # (may have to be repeated a few times)
+
+    mv off/portfolio_* .
+
+    TF_CLI_ARGS_apply="-parallelism=1"
+    terraform apply
+    # (may have to be repeated a few times)
+
+# terraform destroy
+
+    awsume iam
+    terraform destroy 
+    # (may have to be repeated a few times)
+
+    awsume controltower
+    aws organizations list-organizational-units-for-parent --parent-id r-fmly
+
+    aws cloudformation delete-stack-instances --stack-set-name ServiceCatalogAccessStackSet-NiceHelpersTerraform --regions eu-west-1 --no-retain-stacks  --deployment-targets OrganizationalUnitIds=ou-fmly-09e0b44o
+    
+    awsume iam
+    terraform destroy

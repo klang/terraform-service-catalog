@@ -36,6 +36,10 @@ resource "aws_servicecatalog_product_portfolio_association" "product" {
     count        = length(var.products)
     portfolio_id = aws_servicecatalog_portfolio.portfolio.id
     product_id   = var.products[count.index]
+    depends_on = [
+      data.aws_organizations_organizational_units.ou,
+      data.aws_organizations_organization.org
+    ]
 }
 
 # requires
@@ -46,4 +50,8 @@ resource "aws_servicecatalog_portfolio_share" "organizational_units" {
     principal_id = local.ou_arns[count.index]
     portfolio_id = aws_servicecatalog_portfolio.portfolio.id
     type         = "ORGANIZATIONAL_UNIT"
+    depends_on = [
+      data.aws_organizations_organizational_units.ou,
+      data.aws_organizations_organization.org
+    ]
 }

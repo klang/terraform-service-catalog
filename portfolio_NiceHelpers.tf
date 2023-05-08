@@ -26,7 +26,7 @@ module "NiceHelpers" {
     module.TrustRole.product_id,
     module.SimpleVPCAndLinux.product_id,
     module.AccountSpecificTrustRole.product_id]
-  ou_names = ["Custom", "Training", "Juniors"]
+  ou_names = ["Custom", "Juniors"] #  "Training"
   providers = {
     aws.shared = aws.shared
     aws.master = aws.master
