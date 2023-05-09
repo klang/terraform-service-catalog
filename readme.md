@@ -155,7 +155,12 @@ Terraform can't really handle the deletion of stack-instances as they are not pa
     awsume controltower
     aws organizations list-organizational-units-for-parent --parent-id r-fmly
 
+    aws cloudformation list-stack-sets --status ACTIVE 
+    # Custom
     aws cloudformation delete-stack-instances --stack-set-name ServiceCatalogAccessStackSet-NiceHelpersTerraform --regions eu-west-1 --no-retain-stacks  --deployment-targets OrganizationalUnitIds=ou-fmly-09e0b44o
     
+    # Juniors
+    aws cloudformation delete-stack-instances --stack-set-name ServiceCatalogAccessStackSet-NiceHelpersTerraform --regions eu-west-1 --no-retain-stacks  --deployment-targets OrganizationalUnitIds=ou-fmly-t5qr49c2
+
     awsume iam
     terraform destroy

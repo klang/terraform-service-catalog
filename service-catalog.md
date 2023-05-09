@@ -6,6 +6,8 @@ General information about AWS Service Catalog can be found in the [documentation
 
 # Contained here
 
+![overview](./service-catalog-ServiceCatalog.jpg)
+
     * management of products and portfolios in a multi account setup
 
 
